@@ -1,10 +1,23 @@
-import React from 'react';
+import Logo from "../assets/movie_logo.svg";
+import styled from "styled-components";
+
+const Layout = styled.main`
+  display: flex;
+  padding: 29px 0 29px 29px;
+  align-items: center;
+`;
+
+const LogoTitle = styled.span`
+  font-family: "Pretendard-Regular";
+  font-size: 24px;
+`;
 
 const Header = () => {
   return (
-    <div>
-      
-    </div>
+    <Layout>
+      <img src={Logo} />
+      <LogoTitle>reviewSense</LogoTitle>
+    </Layout>
   );
 };
 
