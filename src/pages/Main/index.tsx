@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Category from "../../components/Category";
 import Header from "../../components/Header";
 import Movie from "../../components/Movie";
@@ -17,16 +18,19 @@ const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
 const Main = () => {
+  const navigate = useNavigate();
   const [movieData, setMovieData] = useState<MovieType[]>([]);
   const [filteredData, setFilteredData] = useState<MovieType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [activeCategory, setActiveCategory] = useState<string>("popular");
 
+  // API 호출
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         let allMovies: MovieType[] = [];
-        for (let page = 1; page <= 3; page++) {
+        const totalPages = 3; // 가져올 페이지 수
+        for (let page = 1; page <= totalPages; page++) {
           const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
             params: {
               api_key: TMDB_API_KEY,
@@ -54,9 +58,9 @@ const Main = () => {
 
         setMovieData(allMovies);
         setFilteredData(allMovies);
-        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch movies:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -64,26 +68,26 @@ const Main = () => {
     fetchMovies();
   }, []);
 
+  // 영화 클릭 시 상세 페이지로 이동
+  const handleMovieClick = (id: number) => {
+    navigate(`/detail/${id}`);
+  };
+
+  // 영화 정렬
   const sortMovies = (type: "popular" | "name" | "recommended") => {
-    let sortedMovies;
-    if (type === "popular") {
-      sortedMovies = [...movieData].sort((a, b) => b.star - a.star);
-    } else if (type === "name") {
-      sortedMovies = [...movieData].sort((a, b) =>
-        a.title.localeCompare(b.title, "ko-KR"),
-      );
-    } else if (type === "recommended") {
-      sortedMovies = [...movieData].sort((a, b) => b.star - a.star);
-    } else {
-      return;
-    }
+    const sortedMovies =
+      type === "name"
+        ? [...movieData].sort((a, b) => a.title.localeCompare(b.title, "ko-KR"))
+        : [...movieData].sort((a, b) => b.star - a.star);
+
     setFilteredData(sortedMovies);
     setActiveCategory(type);
   };
 
+  // 영화 검색
   const searchMovies = async (query: string) => {
     if (!query) {
-      setFilteredData(movieData);
+      setFilteredData(movieData); // 검색어가 없으면 전체 데이터 표시
       return;
     }
 
@@ -146,12 +150,13 @@ const Main = () => {
             <p>Loading...</p>
           ) : (
             filteredData.map((movie) => (
-              <Movie
+              <div
                 key={movie.id}
-                img={movie.img}
-                title={movie.title}
-                star={movie.star}
-              />
+                onClick={() => handleMovieClick(movie.id)}
+                style={{ cursor: "pointer" }} // 클릭 가능 표시
+              >
+                <Movie img={movie.img} title={movie.title} star={movie.star} />
+              </div>
             ))
           )}
         </S.MovieList>

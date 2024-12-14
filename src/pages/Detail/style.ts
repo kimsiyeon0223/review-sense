@@ -43,8 +43,7 @@ export const DetailItem = styled.div`
 
 export const DetailTitle = styled.span`
   font-weight: bold;
-
-  width: 100px;
+  width: 400px;
 `;
 
 export const DetailValue = styled.span`

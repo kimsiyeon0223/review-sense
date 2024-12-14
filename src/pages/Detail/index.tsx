@@ -1,20 +1,52 @@
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import * as S from "./style";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import axios from "axios";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+
+interface MovieDetailType {
+  title: string;
+  release_date: string;
+  vote_average: number;
+  poster_path: string;
+  runtime: number;
+  genres: { name: string }[];
+  overview: string; // 영화 설명 추가
+}
+
 const Detail = () => {
-  const MovieDetailInfo = [
-    { id: 1, title: "개봉", value: "2019.12.19." },
-    { id: 2, title: "등급", value: "12세 이상 관람가" },
-    { id: 3, title: "장르", value: "드라마, 액션" },
-    { id: 4, title: "국가", value: "대한민국" },
-    { id: 5, title: "러닝타임", value: "128분" },
-    { id: 6, title: "배급", value: "CJ ENM, 덱스터스튜디오" },
-    { id: 7, title: "평점", value: "7.7" },
-  ];
+  const { id } = useParams<{ id: string }>();
+  const [movieDetail, setMovieDetail] = useState<MovieDetailType | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchMovieDetail = async () => {
+      try {
+        const response = await axios.get(`${TMDB_BASE_URL}/movie/${id}`, {
+          params: {
+            api_key: TMDB_API_KEY,
+            language: "ko-KR",
+          },
+        });
+        setMovieDetail(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch movie detail:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchMovieDetail();
+  }, [id]);
 
   const chartData = {
     labels: ["너무 좋아요", "좋아요", "별로예요", "그저 그래요"],
@@ -40,34 +72,55 @@ const Detail = () => {
   return (
     <>
       <Header />
-      <S.Layout>
-        <S.TitleBox>
-          <S.MovieTitle>백두산</S.MovieTitle>
-          <S.SeeAge>영화 - 2019.12.19. · 12세 이상 관람가</S.SeeAge>
-        </S.TitleBox>
-        <S.MainBox>
-          <S.MovieDetail>
-            {MovieDetailInfo.map((info) => (
-              <S.DetailItem key={info.id}>
-                <S.DetailTitle>{info.title}</S.DetailTitle>
-                <S.DetailValue>{info.value}</S.DetailValue>
+      {loading ? (
+        <p>Loading...</p>
+      ) : movieDetail ? (
+        <S.Layout>
+          <S.TitleBox>
+            <S.MovieTitle>{movieDetail.title}</S.MovieTitle>
+            <S.SeeAge>
+              영화 - {movieDetail.release_date} · {movieDetail.vote_average}{" "}
+              평점
+            </S.SeeAge>
+          </S.TitleBox>
+          <S.MainBox>
+            <S.MovieDetail>
+              <S.DetailItem>
+                <S.DetailTitle>개봉</S.DetailTitle>
+                <S.DetailValue>{movieDetail.release_date}</S.DetailValue>
               </S.DetailItem>
-            ))}
-          </S.MovieDetail>
-          <S.PosterBox>
-            <S.Poster
-              src="https://via.placeholder.com/200x300"
-              alt="백두산 포스터"
-            />
-          </S.PosterBox>
-        </S.MainBox>
-        <S.ReviewBox>
-          <S.ReviewTitle>리뷰</S.ReviewTitle>
-          <S.ChartContainer>
-            <Pie data={chartData} options={chartOptions} />
-          </S.ChartContainer>
-        </S.ReviewBox>
-      </S.Layout>
+              <S.DetailItem>
+                <S.DetailTitle>장르</S.DetailTitle>
+                <S.DetailValue>
+                  {movieDetail.genres.map((genre) => genre.name).join(", ")}
+                </S.DetailValue>
+              </S.DetailItem>
+              <S.DetailItem>
+                <S.DetailTitle>러닝타임</S.DetailTitle>
+                <S.DetailValue>{movieDetail.runtime}분</S.DetailValue>
+              </S.DetailItem>
+              <S.DetailItem>
+                <S.DetailTitle>줄거리</S.DetailTitle>
+                <S.DetailValue>{movieDetail.overview}</S.DetailValue>
+              </S.DetailItem>
+            </S.MovieDetail>
+            <S.PosterBox>
+              <S.Poster
+                src={`https://image.tmdb.org/t/p/w500${movieDetail.poster_path}`}
+                alt={movieDetail.title}
+              />
+            </S.PosterBox>
+          </S.MainBox>
+          <S.ReviewBox>
+            <S.ReviewTitle>리뷰</S.ReviewTitle>
+            <S.ChartContainer>
+              <Pie data={chartData} options={chartOptions} />
+            </S.ChartContainer>
+          </S.ReviewBox>
+        </S.Layout>
+      ) : (
+        <p>영화 정보를 불러올 수 없습니다.</p>
+      )}
     </>
   );
 };
