@@ -3,6 +3,7 @@ import styled from "styled-components";
 const Layout = styled.main`
   display: flex;
   gap: 5px;
+  margin-left: auto;
 `;
 
 const InputBox = styled.input`
