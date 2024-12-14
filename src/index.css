@@ -54,8 +54,8 @@ button {
   transition: border-color 0.25s;
 }
 
-button:hover {
-  border-color: #646cff;
+span {
+  font-family: "Pretendard-Regular";
 }
 
 button:focus,
