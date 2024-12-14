@@ -3,7 +3,7 @@ import styled from "styled-components";
 interface MovieDetailInfo {
   img: string;
   title: string;
-  star: string;
+  star: number;
 }
 
 const Layout = styled.main`
@@ -11,12 +11,19 @@ const Layout = styled.main`
   flex-direction: column;
   padding: 14px 25px;
   background-color: black;
+  color: white;
+  align-items: center;
+  border-radius: 10px;
 `;
 
-const MovieImg = styled.img``;
+const MovieImg = styled.img`
+  width: 212px;
+  height: 303px;
+`;
 
 const MovieTitle = styled.span`
   font-size: 20px;
+  padding-top: 9px;
 `;
 
 const MovieStar = styled.span`
@@ -26,7 +33,7 @@ const MovieStar = styled.span`
 const Movie = ({ img, title, star }: MovieDetailInfo) => {
   return (
     <Layout>
-      <MovieImg src={`https://image.tmdb.org/t/p/w500${img}`} />
+      <MovieImg src={img} />
       <MovieTitle>{title}</MovieTitle>
       <MovieStar>{star}</MovieStar>
     </Layout>
