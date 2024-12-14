@@ -8,7 +8,6 @@ const Layout = styled.main`
 `;
 
 const LogoTitle = styled.span`
-  font-family: "Pretendard-Regular";
   font-size: 24px;
 `;
 
