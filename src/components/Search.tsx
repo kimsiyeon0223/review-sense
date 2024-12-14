@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 
 const Layout = styled.main`
@@ -16,6 +17,7 @@ const InputBox = styled.input`
     outline: none;
   }
 `;
+
 const SearchBtn = styled.button`
   padding: 10px 15px;
   background-color: black;
@@ -26,11 +28,25 @@ const SearchBtn = styled.button`
   }
 `;
 
-const Search = () => {
+interface SearchProps {
+  onSearch: (query: string) => void;
+}
+
+const Search = ({ onSearch }: SearchProps) => {
+  const [query, setQuery] = useState("");
+
+  const handleSearch = () => {
+    onSearch(query);
+  };
+
   return (
     <Layout>
-      <InputBox placeholder="영화제목을 입력하세요." />
-      <SearchBtn>검색</SearchBtn>
+      <InputBox
+        placeholder="영화제목을 입력하세요."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <SearchBtn onClick={handleSearch}>검색</SearchBtn>
     </Layout>
   );
 };
