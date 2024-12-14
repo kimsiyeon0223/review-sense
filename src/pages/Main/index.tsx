@@ -24,12 +24,11 @@ const Main = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [activeCategory, setActiveCategory] = useState<string>("popular");
 
-  // API 호출
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         let allMovies: MovieType[] = [];
-        const totalPages = 3; // 가져올 페이지 수
+        const totalPages = 3;
         for (let page = 1; page <= totalPages; page++) {
           const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
             params: {
@@ -68,12 +67,10 @@ const Main = () => {
     fetchMovies();
   }, []);
 
-  // 영화 클릭 시 상세 페이지로 이동
   const handleMovieClick = (id: number) => {
     navigate(`/detail/${id}`);
   };
 
-  // 영화 정렬
   const sortMovies = (type: "popular" | "name" | "recommended") => {
     const sortedMovies =
       type === "name"
@@ -84,10 +81,9 @@ const Main = () => {
     setActiveCategory(type);
   };
 
-  // 영화 검색
   const searchMovies = async (query: string) => {
     if (!query) {
-      setFilteredData(movieData); // 검색어가 없으면 전체 데이터 표시
+      setFilteredData(movieData);
       return;
     }
 
@@ -153,7 +149,7 @@ const Main = () => {
               <div
                 key={movie.id}
                 onClick={() => handleMovieClick(movie.id)}
-                style={{ cursor: "pointer" }} // 클릭 가능 표시
+                style={{ cursor: "pointer" }}
               >
                 <Movie img={movie.img} title={movie.title} star={movie.star} />
               </div>

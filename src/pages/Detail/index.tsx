@@ -18,7 +18,7 @@ interface MovieDetailType {
   poster_path: string;
   runtime: number;
   genres: { name: string }[];
-  overview: string; // 영화 설명 추가
+  overview: string;
 }
 
 const Detail = () => {
